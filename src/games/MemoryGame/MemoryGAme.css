@@ -1,0 +1,74 @@
+/* src/games/MemoryGame/MemoryGame.css */
+.memory-game {
+  text-align: center;
+}
+
+.game-info {
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+}
+
+.win-message {
+  color: #4caf50;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.card {
+  height: 100px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  font-size: 2rem;
+  transition: transform 0.6s;
+}
+
+.card-front {
+  background-color: #16213e;
+  color: #fff;
+}
+
+.card-back {
+  background-color: #1f4068;
+  transform: rotateY(180deg);
+}
+
+.card.flipped .card-front {
+  transform: rotateY(180deg);
+}
+
+.card.flipped .card-back {
+  transform: rotateY(0deg);
+}
+
+.reset-button {
+  padding: 10px 20px;
+  background-color: #e94560;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+  background-color: #c53d54;
+}

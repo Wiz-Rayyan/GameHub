@@ -1,0 +1,19 @@
+/* src/components/GameContainer/GameContainer.css */
+.game-container {
+  flex: 1;
+  padding: 20px;
+  background-color: #0f3460;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
+
+.game-content {
+  width: 100%;
+  max-width: 800px;
+  background-color: #1a1a2e;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}

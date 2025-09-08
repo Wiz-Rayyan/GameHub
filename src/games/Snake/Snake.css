@@ -1,0 +1,54 @@
+/* src/games/Snake/Snake.css */
+.snake-game {
+  text-align: center;
+}
+
+.game-info {
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+}
+
+.game-over {
+  color: #e94560;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: repeat(20, 1fr);
+  gap: 1px;
+  width: 400px;
+  height: 400px;
+  margin: 0 auto 20px;
+  background-color: #16213e;
+}
+
+.grid-cell {
+  background-color: #1a1a2e;
+}
+
+.grid-cell.snake {
+  background-color: #4caf50;
+}
+
+.grid-cell.food {
+  background-color: #e94560;
+  border-radius: 50%;
+}
+
+.reset-button {
+  padding: 10px 20px;
+  background-color: #e94560;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+  background-color: #c53d54;
+}

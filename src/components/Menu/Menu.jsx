@@ -5,7 +5,7 @@ import './Menu.css';
 const Menu = ({ activeGame, setActiveGame }) => {
   const menuItems = [
     { id: 'tic-tac-toe', name: 'Tic Tac Toe', icon: '⭕' },
-    { id: 'memory-game', name: 'Memory Game', icon: '🎮' },
+   // { id: 'memory-game', name: 'Memory Game', icon: '🎮' },
     { id: 'snake', name: 'Snake', icon: '🐍' },
     { id: 'hangman', name: 'Hangman', icon: '🧩' },
   ];

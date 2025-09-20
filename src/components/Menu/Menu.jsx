@@ -8,6 +8,7 @@ const Menu = ({ activeGame, setActiveGame }) => {
    // { id: 'memory-game', name: 'Memory Game', icon: '🎮' },
     { id: 'snake', name: 'Snake', icon: '🐍' },
     { id: 'hangman', name: 'Hangman', icon: '🧩' },
+    { id: 'QuantumGame' , name: 'Quantum Game', icon: '🕹️' },
   ];
 
   return (

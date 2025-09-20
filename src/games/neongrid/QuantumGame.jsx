@@ -23,21 +23,47 @@ const PLAYING = 1;
 const LEVEL_COMPLETE = 2;
 
 const QuantumGame = () => {
+  // State
   const [gameState, setGameState] = useState(MENU);
   const [currentLevel, setCurrentLevel] = useState(0);
-  const [redPos, setRedPos] = useState([1, 1]);
-  const [bluePos, setBluePos] = useState([6, 6]);
   const [moves, setMoves] = useState(0);
-  const [redPhased, setRedPhased] = useState(false);
-  const [bluePhased, setBluePhased] = useState(false);
   const [entangled, setEntangled] = useState(false);
-  const [level, setLevel] = useState([]);
-  const [redGoal, setRedGoal] = useState([]);
-  const [blueGoal, setBlueGoal] = useState([]);
   const [levelName, setLevelName] = useState('');
   
+  // Refs for values that need to be current in event handlers
+  const redPosRef = useRef([1, 1]);
+  const bluePosRef = useRef([6, 6]);
+  const redPhasedRef = useRef(false);
+  const bluePhasedRef = useRef(false);
+  const entangledRef = useRef(false);
+  const levelRef = useRef([]);
+  const redGoalRef = useRef([]);
+  const blueGoalRef = useRef([]);
+  
+  // State setters that also update refs
+  const setRedPos = (pos) => {
+    redPosRef.current = pos;
+  };
+  
+  const setBluePos = (pos) => {
+    bluePosRef.current = pos;
+  };
+  
+  const setRedPhased = (phased) => {
+    redPhasedRef.current = phased;
+  };
+  
+  const setBluePhased = (phased) => {
+    bluePhasedRef.current = phased;
+  };
+  
+  const setEntangledState = (entangled) => {
+    entangledRef.current = entangled;
+    setEntangled(entangled);
+  };
+
   const canvasRef = useRef(null);
-  const lastProcessedKey = useRef(null);
+  const lastKeyProcessed = useRef(null);
 
   // Load a level
   const loadLevel = useCallback((levelNum) => {
@@ -46,10 +72,10 @@ const QuantumGame = () => {
     setMoves(0);
     setRedPhased(false);
     setBluePhased(false);
-    setEntangled(false);
+    setEntangledState(false);
     
     if (levelNum === 0) {  // Tutorial
-      setLevel([
+      levelRef.current = [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 1, 0, 0, 0, 0, 0],
@@ -58,13 +84,13 @@ const QuantumGame = () => {
         [0, 0, 0, 0, 0, 2, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0]
-      ]);
-      setRedGoal([7, 6]);
-      setBlueGoal([2, 1]);
+      ];
+      redGoalRef.current = [7, 6];
+      blueGoalRef.current = [2, 1];
       setLevelName("Tutorial: Basic Movement");
     
     } else if (levelNum === 1) {  // Swap Gate
-      setLevel([
+      levelRef.current = [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 1, 0, 0, 0, 0, 0],
@@ -73,9 +99,9 @@ const QuantumGame = () => {
         [0, 0, 0, 0, 0, 2, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0]
-      ]);
-      setRedGoal([6, 1]);
-      setBlueGoal([1, 6]);
+      ];
+      redGoalRef.current = [6, 1];
+      blueGoalRef.current = [1, 6];
       setLevelName("Level 1: Quantum Swap");
     }
   }, []);
@@ -94,17 +120,17 @@ const QuantumGame = () => {
       }
       
       // Only process the key if it's different from the last processed key
-      if (event.code === lastProcessedKey.current) {
+      if (event.code === lastKeyProcessed.current) {
         return;
       }
       
-      lastProcessedKey.current = event.code;
+      lastKeyProcessed.current = event.code;
       
       if (gameState === MENU && event.code === 'Space') {
         setGameState(PLAYING);
       } else if (gameState === PLAYING) {
         if (event.code === 'KeyE') {
-          setEntangled(prev => !prev);
+          setEntangledState(!entangledRef.current);
         } else if (event.code === 'KeyW') {
           moveParticles(0, -1);
         } else if (event.code === 'KeyS') {
@@ -123,8 +149,8 @@ const QuantumGame = () => {
     };
 
     const handleKeyUp = (event) => {
-      if (event.code === lastProcessedKey.current) {
-        lastProcessedKey.current = null;
+      if (event.code === lastKeyProcessed.current) {
+        lastKeyProcessed.current = null;
       }
     };
 
@@ -139,9 +165,12 @@ const QuantumGame = () => {
 
   // Move particles (single step)
   const moveParticles = (dx, dy) => {
-    // For red particle - normal movement
-    const newRedX = redPos[0] + dx;
-    const newRedY = redPos[1] + dy;
+    const redPos = redPosRef.current;
+    const bluePos = bluePosRef.current;
+    const level = levelRef.current;
+    const redPhased = redPhasedRef.current;
+    const bluePhased = bluePhasedRef.current;
+    const entangled = entangledRef.current;
     
     // For blue particle - reversed if entangled
     let blueDx = dx;
@@ -150,9 +179,10 @@ const QuantumGame = () => {
       blueDx = -dx;
       blueDy = -dy;
     }
-    
-    const newBlueX = bluePos[0] + blueDx;
-    const newBlueY = bluePos[1] + blueDy;
+
+    // Try to move red particle
+    const newRedX = redPos[0] + dx;
+    const newRedY = redPos[1] + dy;
     
     // Check if red can move
     let redCanMove = false;
@@ -161,6 +191,10 @@ const QuantumGame = () => {
         redCanMove = true;
       }
     }
+    
+    // Try to move blue particle
+    const newBlueX = bluePos[0] + blueDx;
+    const newBlueY = bluePos[1] + blueDy;
     
     // Check if blue can move
     let blueCanMove = false;
@@ -186,6 +220,10 @@ const QuantumGame = () => {
 
   // Check for gate interactions
   const checkGates = (newRedPos, newBluePos) => {
+    const level = levelRef.current;
+    const redGoal = redGoalRef.current;
+    const blueGoal = blueGoalRef.current;
+    
     // Check if red is on a gate
     const redCell = level[newRedPos[1]][newRedPos[0]];
     const blueCell = level[newBluePos[1]][newBluePos[0]];
@@ -198,8 +236,8 @@ const QuantumGame = () => {
       setBluePos(tempPos);
       
       // Update for gate effects
-      if (redCell === 2) setRedPhased(prev => !prev);
-      if (blueCell === 2) setBluePhased(prev => !prev);
+      if (redCell === 2) setRedPhased(!redPhasedRef.current);
+      if (blueCell === 2) setBluePhased(!bluePhasedRef.current);
       
       // Check if both reached goals after swap
       if (newBluePos[0] === redGoal[0] && newBluePos[1] === redGoal[1] &&
@@ -211,11 +249,11 @@ const QuantumGame = () => {
     
     // Phase Gate logic
     if (redCell === 2) {
-      setRedPhased(prev => !prev);
+      setRedPhased(!redPhasedRef.current);
     }
     
     if (blueCell === 2) {
-      setBluePhased(prev => !prev);
+      setBluePhased(!bluePhasedRef.current);
     }
     
     // Check if both reached goals
@@ -252,6 +290,12 @@ const QuantumGame = () => {
       ctx.fillText('Press E to toggle mirrored/opposite movement. Press SPACE to Begin', WIDTH / 2, HEIGHT / 2);
     
     } else if (gameState === PLAYING || gameState === LEVEL_COMPLETE) {
+      const level = levelRef.current;
+      const redGoal = redGoalRef.current;
+      const blueGoal = blueGoalRef.current;
+      const redPos = redPosRef.current;
+      const bluePos = bluePosRef.current;
+      
       // Draw grid
       for (let y = 0; y < GRID_SIZE; y++) {
         for (let x = 0; x < GRID_SIZE; x++) {
@@ -332,7 +376,7 @@ const QuantumGame = () => {
       ctx.fillText(`Moves: ${moves}`, 20, 70);
       
       // Draw entanglement status
-      ctx.fillText(`Entangled: ${entangled ? 'ON' : 'OFF'}`, 20, 100);
+      ctx.fillText(`Entangled: ${entangledRef.current ? 'ON' : 'OFF'}`, 20, 100);
       
       if (gameState === LEVEL_COMPLETE) {
         // Draw level complete overlay
@@ -349,7 +393,7 @@ const QuantumGame = () => {
         ctx.fillText('Press SPACE to continue', WIDTH / 2, HEIGHT / 2 + 50);
       }
     }
-  }, [gameState, level, redGoal, blueGoal, redPos, bluePos, moves, levelName, entangled]);
+  }, [gameState, moves, levelName]);
 
   // Game loop
   useEffect(() => {
